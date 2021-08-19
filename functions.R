@@ -1,9 +1,6 @@
 
 
 
-#amelo_trajectory <- readRDS("amelo_trajectory.rds")
-
-#plot_heatmap_over_realtime(amelo_trajectory,"assigned_cell_type.4",age_clustering_column="age_group", selected_genes= c("SP6","DSPP","AMBN"), normalize = T)
 
 plot_heatmap_over_realtime <- function(cds, clustering_column, age_clustering_column, selected_genes,  normalize = T, trimm_low= T){
 
@@ -43,45 +40,16 @@ age_group_size_factor <- (age_group_cluster_tab/age_group_sum)
 n_clusters <- ncol(age_group_cluster_tab)
 n_age  <- nrow(age_group_cluster_tab)
 n_genes  <- length(selected_genes)
-#print(age_group_cluster_tab)
-#normalized_cell_count <- t(t(age_group_size_factor)/cluster_sum)
-#normalized_cell_count <- t(t(cluster_size_factor)/age_group_sum)
 
-# cluster_size_factor <- (age_group_cluster_tab)/cluster_sum
-# normalized_cell_count <-  age_group_cluster_tab *(age_group_size_factor*cluster_size_factor)
 
  cluster_size_factor <- t(t(age_group_cluster_tab)/cluster_sum)
-# normalized_cell_count <-  age_group_cluster_tab *(age_group_size_factor*cluster_size_factor)
+
  normalized_cell_count <-  (0.5*age_group_size_factor+cluster_size_factor*0.5)
- #print(normalized_cell_count)
-# normalized_cell_count <-  (age_group_size_factor*cluster_size_factor)
-# scaled <-  scales::rescale(as.vector(normalized_cell_count))
-# normalized_cell_count[] <-  matrix(scaled,nrow = nrow(normalized_cell_count),ncol = ncol(normalized_cell_count))
-# normalized_cell_count <-  (age_group_size_factor/cluster_size_factor)
-# normalized_cell_count <-  (cluster_size_factor/age_group_size_factor)
-# normalized_cell_count <- age_group_size_factor
-# 
+ 
  normalized_cell_count[is.nan(normalized_cell_count)] <- 0
  normalized_cell_count[is.infinite(normalized_cell_count)] <- 0
 
  
-# d= 7
-# (normalized_cell_count[1:5,d][normalized_cell_count[1:5,d] > sum(normalized_cell_count[1:5,d]) * 0.01]) #quantile(normalized_cell_count[1:5,d], 
-# 
-# (cluster_size_factor[1:5,d][cluster_size_factor[1:5,d] > sum(cluster_size_factor[1:5,d]) * 0.1]) #quantile(cluster_size_factor[1:5,d], 
-# 
-# 
-# 
-# 
-# (age_group_size_factor[1:5,d][age_group_size_factor[1:5,d] > sum(age_group_size_factor[1:5,d]) * 0.05]) #quantile(age_group_size_factor[1:5,d], 
-# 
-# (age_group_cluster_tab[1:5,d][age_group_cluster_tab[1:5,d] > sum(age_group_cluster_tab[1:5,d]) * 0.15]) #quantile(age_group_cluster_tab[1:5,d], 
-# (normalized_cell_count[1:5,d][normalized_cell_count[1:5,d] > sum(normalized_cell_count[1:5,d]) * 0.05]) #quantile(normalized_cell_count[1:5,d], 
-# (normalized_cell_count[1:5,d][normalized_cell_count[1:5,d] > sum(normalized_cell_count[1:5,d]) * 0.2]) #quantile(normalized_cell_count[1:5,d], 
-# 
-# 
-# 
-# (age_group_size_factor[1:5,d][age_group_size_factor[1:5,d] > sum(age_group_size_factor[1:5,d]) * 0.08]) #quantile(age_group_size_factor[1:5,d], 
 
 normalized_cell_count_drop_low <- normalized_cell_count
 age_group_size_factor_drop_low <- age_group_size_factor
@@ -98,13 +66,6 @@ for (d in seq(colnames(normalized_cell_count))){
   binary_mat[age_zero, d] <- 0
   
 }
-
-#print(binary_mat)
-
-
-# this is not good (cluster_size_factor[1:5,d][cluster_size_factor[1:5,d] > sum(cluster_size_factor[1:5,d]) * 0.05]) #quantile(cluster_size_factor[1:5,d], 
-
-
 
 
 
@@ -176,48 +137,6 @@ multi_cluster[is.infinite(multi_cluster)] <- 0
 colnames(multi_cluster) <- sub('.', '', colnames(multi_cluster)) # remove X
 
 
-# 
-# pdf("realtime_test.pdf")
-# ComplexHeatmap::Heatmap(
-#   name = "expression",
-#   multi_cluster ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = T,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 45,
-#   row_order = NULL,
-#   # cell_fun = function(j, i, x, y, width, height, fill) {
-#   #   grid.text(sprintf("%.1f", multi_cluster[i, j]), x, y, gp = gpar(fontsize = 10))
-#   # },
-#   
-#   left_annotation  = rowAnnotation(foo= anno_block(gp = gpar(fill = randomcoloR::distinctColorPalette(length(unique(anno_df$cluster))) ), #randomcoloR::distinctColorPalette(length(unique(anno_df$cluster)))
-#                                                    labels = unique(anno_df$cluster), 
-#                                                    labels_gp = gpar(col = "black", fontsize = 10))),
-#   row_split = factor(anno_df$cluster, levels =  unique(anno_df$cluster)),
-#   row_title = " ",
-#   use_raster = T,
-#   show_heatmap_legend = T
-# )
-# h1
-# dev.off()
-# 
-# 
-# multi_cluster[is.nan(multi_cluster)] <- 0
-# ComplexHeatmap::Heatmap(
-#   name = "expression",
-#   multi_cluster ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = T,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 45,
-#   row_title = " ",
-#   row_split = factor(anno_df$cluster, levels =  unique(anno_df$cluster)),
-#   show_heatmap_legend = T
-# )
 
 multi_cluster_reordered <- multi_cluster[seq.int(1, length(anno_df$names), length(levels(anno_df$names)) ),]
 for (gene_i in 2: n_genes){
@@ -265,86 +184,11 @@ for (gene_i in 1: n_genes){
 
 }
 
-#seq.int(from =2,length.out=2 , by=6)
-#multi_cluster_reordered[(gene_i*n_clusters):(n_clusters*gene_i),] <- matrix(vec[,gene_i],nrow = n_clusters,ncol = n_age)
-# multi_cluster_reordered[1:7,] <- matrix(vec,nrow = 7,ncol = 5)
-# 
-# vec <- scale(as.vector( multi_cluster_reordered[8:14,]))
-# vec <- scales::rescale(vec, to=c(-2,2) )
-# multi_cluster_reordered[8:14,] <- matrix(vec,nrow = 7,ncol = 5)
-# 
-# 
-# vec <- scale(as.vector( multi_cluster_reordered[15:21,]))
-# vec <- scales::rescale(vec, to=c(-2,2) )
-# multi_cluster_reordered[15:21,] <- matrix(vec,nrow = 7,ncol = 5)
-# 
-# 
-# 
-# multi_cluster_reordered[1:7,] <- scales::rescale(multi_cluster_reordered[1:7,], to=c(-2,2) )
-# multi_cluster_reordered[8:14,] <-scales::rescale(multi_cluster_reordered[8:14,], to=c(-2,2) )
-# multi_cluster_reordered[15:21,] <- scales::rescale(multi_cluster_reordered[15:21,] , to=c(-2,2))
-# 
-# multi_cluster_reordered[1:7,] <- t(scale(t(multi_cluster_reordered[1:7,])))
-# multi_cluster_reordered[1:7,] <- (scale((multi_cluster_reordered[1:7,])))
-# multi_cluster_reordered[8:14,] <- t(scale(t(multi_cluster_reordered[8:14,])))
-# multi_cluster_reordered[8:14,] <- (scale((multi_cluster_reordered[8:14,])))
-# multi_cluster_reordered[15:21,] <- t(scale(t(multi_cluster_reordered[15:21,])))
-# multi_cluster_reordered[15:21,] <- (scale((multi_cluster_reordered[15:21,])))
-# 
 
 
 
-# h1 <-  ComplexHeatmap::Heatmap(
-#   name = "SP6",
-#   multi_cluster_reordered[1:7,] ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = T,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 90,
-#   row_order = NULL,
-#   row_labels = unique(anno_df$cluster),
-#   row_title = "SP6",
-#   use_raster = T,
-#   show_heatmap_legend = T,
-#   col = circlize::colorRamp2(c( min(multi_cluster_reordered[1:7,]),0, max(multi_cluster_reordered[1:7,])), colors = colorRampPalette(rev(brewer.pal(n = 7, name =
-#                                                                                                                                                       "RdYlBu")))(100))
-# )
-# 
-# h2 <-  ComplexHeatmap::Heatmap(
-#   name = "DSPP",
-#   multi_cluster_reordered[8:14,]  ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = T,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 90,
-#   row_order = NULL,
-#   row_labels = unique(anno_df$cluster),
-#   row_title = "DSPP",
-#   use_raster = T,
-#   show_heatmap_legend = T,
-#   col = circlize::colorRamp2(c( min(multi_cluster_reordered[8:14,]),0, max(multi_cluster_reordered[8:14,])), c( "lightslateblue","white","red"))
-# )
-# 
-# h3 <-  ComplexHeatmap::Heatmap(
-#   name = "AMBN",
-#   multi_cluster_reordered[15:21,] ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = T,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 90,
-#   row_order = NULL,
-#   row_labels = unique(anno_df$cluster),
-#   row_title = "AMBN",
-#   use_raster = T,
-#   show_heatmap_legend = T,
-#   col = circlize::colorRamp2(c( min(multi_cluster_reordered[15:21,]),0, max(multi_cluster_reordered[15:21,])), c( "lightslateblue","white","red"))
-# )
+
+
 
 pdf(paste("realtime_Heatmap_output","/",cds_name,"_",paste(selected_genes,collapse = "_"),"_realtime_Heatmap.pdf", sep = ""), 4,10)
 draw(ht_list, padding = unit(c(2, 2, 2, 25), "mm")) 
@@ -362,4 +206,5 @@ end_time - start_time
 
 }
 
+# example
 #plot_heatmap_over_realtime(amelo_trajectory,"assigned_cell_type.4",age_clustering_column="age_group", selected_genes= c("SP6","DSPP","AMBN","PLOD2") )
