@@ -1,5 +1,3 @@
-setwd("C:/Users/afrit/Desktop/Projects/scRNA-seq/QC_Tooth_data/monocle3_cds")
-
 #install.packages('Seurat')
 library(Seurat)
 library(monocle3)
@@ -356,7 +354,7 @@ FeaturePlot(seurat_mouse_epi,reduction = "ref.umap",  features = "AMBN", label =
             label.size = 3, repel = TRUE, order= T,pt.size=5)  + ggtitle("Query transferred labels")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
 
 
-
+# To copy dataset data from mmonocle cds to seurat dataset
 reference.import <- reference.integrated
 
 Amelo_cds_MTi
@@ -441,7 +439,7 @@ FeaturePlot(reference.integrated,reduction = "ref.umap",  features = "AMBN", lab
 
 
 
-#######################################33
+######################################
 
 OE_Am.anchors <- FindTransferAnchors(reference = reference.import, query = seurat_OE_Am, 
                                      dims = 1:50, reference.reduction = "pca",scale = F)
