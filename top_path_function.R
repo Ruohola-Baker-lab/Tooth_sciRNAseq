@@ -103,8 +103,7 @@ top_pathway <- function(scMlnet_results, deg, receiver_cell = receiver_cell,  TF
     
     scMlnet_results$LigRec <- as.data.frame(scMlnet_results$LigRec)
     scMlnet_results$LigRec$rec_n <- 0
-    # scMlnet_results$RecTF[,3] <- 0
-    # scMlnet_results$RecTF <- cbind(scMlnet_results$RecTF, 0)
+
     
     names_rec <- names(rec_n)
     for (rec in seq(rec_n)){
@@ -160,36 +159,7 @@ top_pathway <- function(scMlnet_results, deg, receiver_cell = receiver_cell,  TF
     pathway_n$score.perc <- scales::percent((pathway_n$score/sum(pathway_n$score)),
                                             accuracy= 0.1)
     
-    # path_size_factor <- table(CellChatDB[CellChatDB$ ,]$pathway_name)
-    # pathway_n <- pathway_n/path_size_factor[names(pathway_n)]
-    
-    
-    ## aggregte pathways
-    # lig_rank_all <- as.data.frame(lig_rank_all)
-    # lig_rank_all$pathway <- ""
-    # 
-    # ligand_name <- lig_rank_all$Var1 
-    # for (p in lig_rank_all$Var1){
-    #   lig_rank_all[lig_rank_all$Var1 == p,]$pathway <- CellChatDB[CellChatDB$ligand == p,]$pathway_name[1]
-    #   
-    # }
-    # 
-    # pathway_n <- lig_rank_all %>% group_by(pathway) %>% summarise(get(path_fun)(Freq),.groups = 'drop')
-    # colnames(pathway_n)[2] <- "score"
-    # 
-    # pathway_n <- pathway_n[order(pathway_n$score, decreasing = T),]
-    # pathway_n$score <- (pathway_n$score/sum(pathway_n$score))*100
-    # pathway_n$score.perc <- scales::percent((pathway_n$score/sum(pathway_n$score)),
-    #                                         accuracy= 0.1)
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     # Package
     library(treemap)
