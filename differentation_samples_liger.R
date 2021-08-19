@@ -1,129 +1,11 @@
 
 
-OE_Am_cds <- readRDS("C:/Users/afrit/Desktop/Projects/scRNA-seq/QC_Tooth_data/monocle3_cds/CDS_collecttions/OE_Am_aresidual_100d_15_0,01_40k.rds")
-Amelo_cds <- readRDS("C:/Users/afrit/Desktop/Projects/scRNA-seq/QC_Tooth_data/monocle3_cds/combined_amelo_with_trajectory_cds.rds")
-
 Amelo_cds <- readRDS("matched_amelo_trajectory_cds_new_cluster2.rds") ### new matched
 Amelo_cds <- readRDS("new_amelo_trajectory_6_30_2020.rds") ### new un matched
 Amelo_cds <- readRDS("combined_OE_dental_after_matching_incisors_molars.rds") ### all epi after matching
 Amelo_cds <- readRDS("OE_dental_50dim_45L_0.1_10k.rds")### all epi no matching
 
  
-
-plot <- plot_cells(
-  Amelo_cds,
-  color_cells_by = "cluster",
-  group_cells_by = "cluster",
-  cell_size = 1,
-  group_label_size = 5,
-  alpha = 1,
-  label_cell_groups = F,
-  genes = c("RYR2","THBD","HEY2","VAT1L","MYLK","SOX5"),
-  show_trajectory_graph = F,
-) #+ scale_y_reverse()
-plot_data <-plot$data 
-plot_data <- plot_data[order(plot_data$value, na.last = F),]
-plot$data  <- plot_data
-print(plot + coord_fixed(ratio = 1))+ theme(
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.title=element_text(size=14))+theme(strip.text.x=element_text(size = 14,face = "bold"),legend.title = element_text(size=14)) #scale_x_reverse()
-
-
-
-OE_Am_cds <- preprocess_cds(OE_Am_cds, num_dim = 40, verbose = T)
-OE_Am_cds <- align_cds(OE_Am_cds, alignment_group = "diff_time_point") # residual_model_formula_str ="~diff_time_point" ) 
-#OE_Am_cds <- align_cds(OE_Am_cds, residual_model_formula_str ="~diff_time_point" ,alignment_group = "diff_time_point") 
-#OE_Am_cds <- align_cds(OE_Am_cds, residual_model_formula_str ="~diff_time_point")
-OE_Am_cds <- reduce_dimension(OE_Am_cds, umap.metric = "Cosine",   umap.n_neighbors =15L, umap.min_dist = 0.0001, verbose = T, cores =5) 
-OE_Am_cds <- cluster_cells(OE_Am_cds, k = 31, verbose = T, partition_qval = 0.05, louvain_iter = 2 )
-
-plot_cells(OE_Am_cds, color_cells_by="cluster", group_cells_by="cluster", cell_size=1, group_label_size= 7, alpha = 1, label_cell_groups = T, show_trajectory_graph = T,label_branch_points=F,label_leaves=F,trajectory_graph_segment_size=1,trajectory_graph_color= "black" ) + coord_fixed(ratio = 1)+ scale_y_reverse()+ scale_x_reverse() +theme(
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks = element_blank(),
-  axis.title=element_text(size=10),
-  legend.title=element_text(size=16),
-  line = element_line(size = 7)) 
-
-
-OE_Am_cds <- learn_graph(OE_Am_cds, use_partition = T, close_loop = F, learn_graph_control=list(orthogonal_proj_tip= T, minimal_branch_len= 12,prune_graph=T))
-OE_Am_cds <- order_cells(OE_Am_cds)
-#plot_cells(epi_cds, color_cells_by="pseudotime", group_cells_by="cluster", cell_size=1.5, group_label_size= 5, label_cell_groups = F, trajectory_graph_color = "black" , label_groups_by_cluster = F,label_leaves = F)+ coord_fixed(ratio = 1)
-
-plot_cells(OE_Am_cds, color_cells_by="pseudotime", group_cells_by="cluster", cell_size=1.5, group_label_size= 5, label_cell_groups = F, trajectory_graph_color = "white" , label_groups_by_cluster = F,label_leaves = F,label_roots = F,label_branch_points = F,trajectory_graph_segment_size=1)+ scale_x_reverse()+ coord_fixed(ratio = 1)+theme(
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks = element_blank(),
-  axis.title=element_text(size=10),
-  legend.title=element_text(size=16),
-  line = element_line(size = 7))
-
-colData(OE_Am_cds)$new_partition <- dplyr::recode_factor(clusters(OE_Am_cds),
-                                                         '7'='1',
-                                                         '8'='1',
-                                                         '1'='1',
-                                                         '5'='1',
-                                                         '6'='1',
-                                                         '3'='1',
-                                                         '2'='1',
-                                                         '12'='1',
-                                                         '10'='1',
-                                                         '4'='1',
-                                                         '9'='2',
-                                                         '15'='3',
-                                                         '14'='4',
-                                                         '11'='5',
-                                                         '13'='6')
-OE_Am_cds@clusters@listData[["UMAP"]][["partitions"]] <- colData(OE_Am_cds)$new_partition
-OE_Am_cds@clusters@listData[["UMAP"]][["partitions"]] <- as.factor(rep("1", ncol(OE_Am_cds)))
-names(OE_Am_cds@clusters@listData[["UMAP"]][["partitions"]])<- colnames(OE_Am_cds)
-partitions(OE_Am_cds)
-
-colData(OE_Am_cds)$new_clusters <- dplyr::recode_factor(clusters(OE_Am_cds),
-                                                        '7'='1',
-                                                        '8'='2',
-                                                        '1'='3',
-                                                        '5'='4',
-                                                        '6'='5',
-                                                        '3'='6',
-                                                        '2'='7',
-                                                        '12'='8',
-                                                        '10'='9',
-                                                        '4'='10',
-                                                        '9'='11',
-                                                        '15'='12',
-                                                        '14'='13',
-                                                        '11'='14',
-                                                        '13'='15')
-
-saveRDS(OE_Am_cds, "OE_Am_residual_50d_15_0.0001_30k_traject_3.rds")
-OE_Am_cds <- readRDS("OE_Am_residual_50d_15_0.0001_30k_traject_3.rds")
-
-
-
-plot_density(OE_Am_cds, groups_column = "diff_time_point" , nrow = NULL,
-             ncol = NULL, x_reverse = T, y_reverse =FALSE) + scale_x_reverse()
-
-plot <- plot_cells(
-  OE_Am_cds,
-  color_cells_by = "cluster",
-  group_cells_by = "cluster",
-  cell_size = 1,
-  group_label_size = 5,
-  alpha = 1,
-  label_cell_groups = F,
-  genes = c("AMBN"),
-  show_trajectory_graph = F,
-) #+ scale_y_reverse()
-plot_data <-plot$data 
-plot_data <- plot_data[order(plot_data$value, na.last = F),]
-plot$data  <- plot_data
-print(plot + coord_fixed(ratio = 1))+ scale_x_reverse()+theme(
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.title=element_text(size=14))+theme(strip.text.x=element_text(size = 14,face = "bold"),legend.title = element_text(size=14))
-
 
 
 #### Highlite the trajectory 
@@ -153,18 +35,6 @@ List_of_MT_genes <-
 OE_Am_cds <-
   OE_Am_cds[!OE_Am_cds@rowRanges@elementMetadata@listData[["gene_short_name"]] %in% List_of_MT_genes,]
 
-# removeing side clusters
-OE_Am_cds <- OE_Am_cds[,colData(OE_Am_cds)$differentiation_trajectory %in% c(1:5)]
-
-list_of_cell_names <- c()
-markers_cds <- OE_Am_cds[rowData(OE_Am_cds)$gene_short_name  %in% c("KRT5","AMBN","ENAM"),]
-markers_cds <- detect_genes(markers_cds, min_expr = 0.000001)
-markers_cds <- markers_cds[, markers_cds@colData$num_genes_expressed >0]
-
-length_to_match <- length(colnames(Amelo_cds)) - (length(colnames(markers_cds)))
-
-colData(OE_Am_cds)$cluster_time_point <- as.integer(monocle3::clusters(OE_Am_cds))
-colData(OE_Am_cds[,colData(OE_Am_cds)$diff_time_point == "day_16"])$cluster_time_point <- colData(OE_Am_cds[,colData(OE_Am_cds)$diff_time_point == "day_16"])$cluster_time_point + 20
 
 # a loop to downsample per cluster
 for (n in unique(colData(OE_Am_cds)$cluster_time_point)) {
@@ -451,38 +321,6 @@ data.frame(clustmd$Clusters[-17],clustmd$Clusters[-1])
 ggplot(clustmd, aes(x=rating, fill=Clusters)) + geom_density(alpha=.3)
 
 
-library(igraph)#  load igraph. Probably not needed unless you get an error
-
-trajectory<- data.frame(clustmd$Clusters[-17],clustmd$Clusters[-1])
-
-#tempora_object@layouts<-  matrix(c(new_postion_for_clusters_on_x_axis, preserve_y_axis),  ncol = 2)
-#tempora_object@layouts[,2]<- tempora_object@layouts[,2]*5 # For now this is not necessary ...to scale the graph a bit taller than width, or scale down the width :Note: if you have to do that you'll have to change the sizes of the circles "vertex.size"
-#tempora_object@layouts[,1]<- tempora_object@layouts[,1]/2  #  or scale down the width :Note: if you have to do that you'll have to change the sizes of the circles "vertex.size"
-
-edge_graph <- igraph::graph_from_data_frame(d=trajectory, vertices = clustmd, directed = T)
-layout <- igraph::layout_as_tree(edge_graph, flip.y =F)
-layout <- layout[,c(2,1)]
-y_scale <- c(min(layout[,2]-0.1),max(layout[,2]+0.1))
-x_scale <- c(0,max(layout[,1]))
-colours <- RColorBrewer::brewer.pal(length(levels(Timepoints)), "YlOrRd")
-
-# plot to pdf
-cairo_pdf("tempora_liger_am_traj.pdf",50,10)
-par(mar=c(0,0,10,0),cex.lab=7)
-igraph::plot.igraph(edge_graph, ylim=y_scale,xlim=x_scale, ylab = "", layout = layout, vertex.shape = "pie", vertex.pie = lapply(1:nrow(clustmd), function(x) as.numeric(clustmd[x,2:((length(levels(Timepoints)))+1)])),
-                    vertex.pie.color=list(colours), pie.border=list(rep("white", length(levels(Timepoints)))), vertex.frame.color="white",
-                    vertex.label.color="black", 
-                    vertex.size=50, edge.width =5, edge.arrow.size =2
-                    , vertex.label.dist=5,vertex.label.cex=7, vertex.label.degree=pi/2, rescale=F) # label is number of clusters
-legend("top",inset=c(0,-0.3) , legend = levels(Timepoints), fill=colours, bty = "n", border = "black", cex = 7, horiz=TRUE)
-axis(side=3, at=c(min(layout[,1]-0.1),max(layout[,1]+0.1)), labels=c("Early","Late"), las=1, cex.axis = 7)
-dev.off()
-
-
-
-
-
-
 ## to make them un stacked
 cluster_counts <- count(clusters_df,clusters)
 dataset_counts <- count(clusters_df,clusters,dataset)
@@ -508,7 +346,7 @@ ggplot(data=meta.data, aes(x=Clusters, fill=Timepoints)) +
 
 
 # clustering day16alone
-Am_16d_cds <- readRDS("C:/Users/afrit/Desktop/Projects/scRNA-seq/QC_Tooth_data/monocle3_cds/CDS_collecttions/Am16_diff.RDS")
+Am_16d_cds <- readRDS("CDS_collecttions/Am16_diff.RDS")
 
 Am_16d_cds <- preprocess_cds(Am_16d_cds, num_dim = 10, verbose = T)
 #Am_16d_cds <- align_cds(Am_16d_cds, alignment_group = "diff_time_point") # residual_model_formula_str ="~diff_time_point" ) 
@@ -916,8 +754,7 @@ List_of_MT_genes <-
 OE_Am_cds <-
   OE_Am_cds[!OE_Am_cds@rowRanges@elementMetadata@listData[["gene_short_name"]] %in% List_of_MT_genes,]
 
-# removeing side clusters
-OE_Am_cds <- OE_Am_cds[,colData(OE_Am_cds)$differentiation_trajectory %in% c(1:5)]
+
 
 list_of_cell_names <- c()
 markers_cds <- OE_Am_cds[rowData(OE_Am_cds)$gene_short_name  %in% c("KRT5","AMBN","ENAM","SP6","PITX2"),]
