@@ -199,7 +199,6 @@ ggplot(data=incedence_tib,aes(x=Age_group, y=name,size = value, col=Type))  + ge
 
 
 
-
 ##### DEV scores
 
 # I ran differtial expression between DE and OB, no need to run this again
