@@ -62,16 +62,6 @@ data_file <- paste("custom_Heatmap_output","/",cds_name, "_heatmapData.Rdata", s
 }else {
   loaded <- F
 }
-  
-
-
-
-
-# if (!dir.exists(data.dir)){
-#   
-#   loaded = F
-#   #setwd(data.dir)
-# }
 
 
 
@@ -228,9 +218,7 @@ df_sub <- as.data.frame(colnames(mat_all))
 colnames(df_sub) <- "Clusters"
 row.names(df_sub) <- df_sub$Clusters
 
-# cds <- Amelo_cds_MTi
-# clustering_column <- "assigned_cell_type.4"
-# age_clustering_column <- "age_group"
+
 # add annotation for age group
 print("calculating the age_score and the age_group annotation")
 age_group_df <- table(colData(cds)[,c(age_clustering_column,clustering_column)])
@@ -254,32 +242,6 @@ df_sub <- df_sub[ order(df_sub$age_score),]
 mat_all <- mat_all[row.names(df),]
 
 
-#library(ComplexHeatmap)
-
-# print("plotting heatmap to pdf")
-# pdf("custom_Heatmap_TESTING.pdf")
-# ch <- ComplexHeatmap::Heatmap(
-#   name = "expression",
-#   mat_all[row.names(df), ] ,
-#   cluster_columns = F,
-#   cluster_rows = F,
-#   show_row_name = F,
-#   show_column_names = T,
-#   column_names_side = "top",
-#   column_names_rot = 45,
-#   bottom_annotation  = HeatmapAnnotation(age_score =df_sub[, 3] , age_group=t(age_group_df), annotation_name_side="right"), #major_age= df_sub[, 2],
-#   left_annotation  = rowAnnotation(foo =anno_mark(at = which(row.names(mat_all) %in% selected_markers ), labels =row.names(df)[row.names(df) %in% selected_markers ], side = "left", labels_gp = gpar(fontsize  = 5))),
-#   row_split  = factor(df$highest, levels = colnames(mat_all)),
-#   row_title = " ",
-#   use_raster = T,
-#   show_heatmap_legend = T
-# )
-# draw(ch)
-# 
-# dev.off()
-
- 
-
 library(ViSEAGO)
 
 # load genes background
@@ -288,18 +250,6 @@ background=keys(org.Hs.eg.db, keytype ='ENSEMBL')
 background=intersect(background,row.names(cds))
 background <- background[background %in% row.names(cds)]
 
-
-# connect to Ensembl . #biomart 2.42.1
-# print("loading GO annotation database")
-# Ensembl<-ViSEAGO::Ensembl2GO(biomart = "ensembl", host = "www.ensembl.org",
-#                              version = NULL)
-# # Display table of available organisms with Ensembl
-# #ViSEAGO::available_organisms(Ensembl)
-# # load GO annotations from Ensembl
-# myGENE2GO<-ViSEAGO::annotate(
-#   "hsapiens_gene_ensembl",
-#   Ensembl
-# )
 
 # load gene selection
 myGENE2GO <- readRDS("/home/ubuntu/data_sci_RNA_seq/myGENE2GO.rds")
@@ -490,10 +440,7 @@ for (s in  colnames(mat_all)){
   ranked_go <- unique(ranked_go[!is.na(ranked_go)])
   word <- ranked_go[ranked_go != "NA"]
   
-  # word <-ranked_go[,which(colnames(mat_all) == s)][charmatch(go_term_df[,which(colnames(mat_all) == s)],words$word)]
-  # word <- word[!is.na(word)]
-  # word <- word[word != "NA"]
-  
+ 
   freq <- seq(length(word),1)
   words <- data.frame(word = word, freq = freq)
   list_word_df[[s]] <- words
