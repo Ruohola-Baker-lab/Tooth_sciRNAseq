@@ -6,6 +6,7 @@ OE_Am_cds <- readRDS("OE_Am_cds_may_27.rds")
 Amelo_cds_MTi <-readRDS("epi_cds_MTi_70_manhattan_8L_0.3_7k_pesudo_regressed_assigned_cell_type_7.rds")
 
 
+#simplify the labels
 colData(Amelo_cds_MTi)$simplified <- dplyr::recode_factor(colData(Amelo_cds_MTi)$assigned_cell_type.4,
                                                           "OE" = "OE",
                                                           "DE-Prog" = "DE-Prog",
@@ -21,6 +22,7 @@ colData(Amelo_cds_MTi)$simplified <- dplyr::recode_factor(colData(Amelo_cds_MTi)
                                                           "AM-1" = "AM", 
                                                           "AM-2" = "AM")
 
+# remove MT genes
 List_of_MT_genes <-
   OE_Am_cds@rowRanges@elementMetadata@listData$gene_short_name[grep("^MT-",
                                                                     OE_Am_cds@rowRanges@elementMetadata@listData$gene_short_name)]
@@ -72,104 +74,6 @@ seurat_OE_Am_sub <-CreateSeuratObject(counts = mat_OE_Am_sub, project = "integra
 
 
 integration.list <- list(seurat_Amelo,seurat_OE_Am)
-
-
-### fast integration method. less matching 
-# normalize and identify variable features for each dataset independently
-integration.list<- lapply(X = integration.list, FUN = function(x) {
-  x <- NormalizeData(x)
-  x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
-})
-
-# select features that are repeatedly variable across datasets for integration run PCA on each
-# dataset using these features
-features <- SelectIntegrationFeatures(object.list = integration.list)
-integration.list<- lapply(X = integration.list, FUN = function(x) {
-  x <- ScaleData(x, features = features, verbose = FALSE)
-  x <- RunPCA(x, features = features, verbose = FALSE)
-})
-
-integration.anchors <- FindIntegrationAnchors(object.list = integration.list, anchor.features = features, reduction = "rpca",  k.anchor = 20) #  k.anchor = 5
-# this command creates an 'integrated' data assay
-integration.combined <- IntegrateData(anchorset = integration.anchors)
-
-# specify that we will perform downstream analysis on the corrected data note that the original
-# unmodified data still resides in the 'RNA' assay
-DefaultAssay(integration.combined) <- "integrated"
-
-# Run the standard workflow for visualization and clustering
-integration.combined <- ScaleData(integration.combined, verbose = FALSE)
-integration.combined <- RunPCA(integration.combined, npcs = 30, verbose = FALSE)
-integration.combined <- RunUMAP(integration.combined, reduction = "pca", dims = 1:30)
-integration.combined <- FindNeighbors(integration.combined, reduction = "pca", dims = 1:30)
-integration.combined <- FindClusters(integration.combined, resolution = 0.5)
-
-# Visualization
-p1 <- DimPlot(integration.combined, reduction = "umap", group.by = "experiment")
-p2 <- DimPlot(integration.combined, reduction = "umap", group.by = "preAnnotation", label = TRUE, 
-              repel = TRUE)
-p1 + p2
-
-
-#You can increase the strength of alignment by increasing the k.anchor parameter, which is set to 5 by default. Increasing this parameter to 20 will assist in aligning these populations.
-
-# repeat with scattransform normalization  REQUIRE a LOT OF RAM
-BiocManager::install("glmGamPoi")
-
-
-
-integration.list <- lapply(X = integration.list, FUN = SCTransform, method = "glmGamPoi")
-features <- SelectIntegrationFeatures(object.list = integration.list, nfeatures = 3000)
-integration.list <- PrepSCTIntegration(object.list = integration.list, anchor.features = features)
-integration.list <- lapply(X = integration.list, FUN = RunPCA, features = features)
-integration.anchors <- FindIntegrationAnchors(object.list = integration.list, normalization.method = "SCT", 
-                                         anchor.features = features, dims = 1:30, reduction = "rpca", k.anchor = 20)
-integration.combined.sct <- IntegrateData(anchorset = integration.anchors, normalization.method = "SCT", dims = 1:30)
-integration.combined.sct <- RunPCA(integration.combined.sct, verbose = FALSE)
-integration.combined.sct <- RunUMAP(integration.combined.sct, reduction = "pca", dims = 1:30)
-# Visualization
-p1 <- DimPlot(integration.combined.sct, reduction = "umap", group.by = "experiment")
-p2 <- DimPlot(integration.combined.sct, reduction = "umap", group.by = "preAnnotation", label = TRUE, 
-              repel = TRUE)
-p1 + p2
-
-
-
-#### the slower method, but maybe overcorrection
-
-integration.list <- list(seurat_Amelo,seurat_OE_Am)
-# normalize and identify variable features for each dataset independently
-integration.list <- lapply(X = integration.list, FUN = function(x) {
-  x <- NormalizeData(x)
-  x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
-})
-
-# select features that are repeatedly variable across datasets for integration
-features <- SelectIntegrationFeatures(object.list = integration.list)
-integration.anchors <- FindIntegrationAnchors(object.list = integration.list, anchor.features = features)
-# this command creates an 'integrated' data assay
-integration.combined <- IntegrateData(anchorset = integration.anchors)
-# specify that we will perform downstream analysis on the corrected data note that the original
-# unmodified data still resides in the 'RNA' assay
-DefaultAssay(integration.combined) <- "integrated"
-
-# Run the standard workflow for visualization and clustering
-integration.combined <- ScaleData(integration.combined, verbose = FALSE)
-integration.combined <- RunPCA(integration.combined, npcs = 30, verbose = FALSE)
-integration.combined <- RunUMAP(integration.combined, reduction = "pca", dims = 1:30,n.neighbors = 40L,min.dist = 0.1)
-integration.combined <- FindNeighbors(integration.combined, reduction = "pca", dims = 1:30)
-integration.combined <- FindClusters(integration.combined, resolution = 0.5)
-
-# Visualization
-p1 <- DimPlot(integration.combined, reduction = "umap", group.by = "experiment")
-p2 <- DimPlot(integration.combined, reduction = "umap", label = TRUE, repel = TRUE)
-p2 <- DimPlot(integration.combined, reduction = "umap", group.by = "preAnnotation", label = TRUE, 
-              repel = TRUE)
-p1 + p2
-
-
-saveRDS(integration.combined, "integration.combined_seuratBoject_slow_40L_dist,01.rds")
-saveRDS(OE_Am_cds_down,"OE_Am_cds_down_PITX2_AMBN_SP6_KRT5_ENAM_saved.rds")
 
 
 ### building reference
@@ -251,8 +155,6 @@ p1 + p2
 saveRDS(reference.integrated,"reference.integrated_amelo_set_Seurat_close_to_monocle.rds")
 
 
-# In data transfer, Seurat does not correct or modify the query expression data.
-# In data transfer, Seurat has an option (set by default) to project the PCA structure of a reference onto the query, instead of learning a joint structure with CCA. We generally suggest using this option when projecting data between scRNA-seq datasets.
 
  # projection
 # diff data  seurat_OE_Am is the query 
@@ -292,68 +194,6 @@ refquery <- RunUMAP(refquery, reduction = 'umap', dims = 1:30)
 DimPlot(refquery, group.by = 'id', shuffle = TRUE)
 
 
-
-### projecting mouse data into ours
-
-mouse_epi <- readRDS("Mouse_tooth_atlas/epithelial_data.rds")
-
-mouse_epi_count <- read.table("Mouse_tooth_atlas/epithelial.txt")
-
-row.names(mouse_epi_count)  <- toupper(row.names(mouse_epi_count))
-
-# rename the clusters from number to the names given in the paper figures
-mouse_epi_annotation <- dplyr::recode_factor(mouse_epi$clusters,
-                                                    '1' = 'SI-cubodial',
-                                                    '2' = 'SR',
-                                                    '3' = "Am-RYR2",
-                                                    '4' = 'OEE',
-                                                    '5' = 'Am-Sec',
-                                                    '6' = 'Am-PM',
-                                                    '7' = 'OEE-Prog',
-                                                    '8' = 'SI-1',
-                                                    '9' = 'SI-2',
-                                                    '10' = 'Am-M',
-                                                    '11' = 'PA',
-                                                    '12' = "SI-Prog",
-                                                    '13' = 'SC')  
-
-
-
-names(mouse_epi_annotation) <- names(mouse_epi$clusters)
-mouse_epi_annotation <- as.data.frame(mouse_epi_annotation)
-seurat_mouse_epi <-CreateSeuratObject(counts = mouse_epi_count, project = "mouse_epi", min.cells = 1, min.features = 1, meta.data = mouse_epi_annotation)
-
-
-mouse_epi.anchors <- FindTransferAnchors(reference = reference.integrated, query = seurat_mouse_epi, 
-                                     dims = 1:50, reference.reduction = "pca", k.anchor =145)
-predictions <- TransferData(anchorset = mouse_epi.anchors, refdata = reference.integrated$preAnnotation, 
-                            dims = 1:30)
-seurat_mouse_epi <- AddMetaData(seurat_mouse_epi, metadata = predictions)
-
-
-reference.integrated <- RunUMAP(reference.integrated, dims = 1:50, reduction = "pca", return.model = TRUE)  # already done
-seurat_mouse_epi <- MapQuery(anchorset = mouse_epi.anchors, reference = reference.integrated, query = seurat_mouse_epi, 
-                         refdata = list(preAnnotation = "preAnnotation"), reference.reduction = "pca", reduction.model = "umap")
-
-
-p1 <- DimPlot(reference.integrated, reduction = "umap", group.by = "preAnnotation", label = TRUE, label.size = 3, 
-              repel = TRUE) + NoLegend() + ggtitle("Reference annotations")+ scale_x_reverse() +scale_y_reverse() 
-p2 <- DimPlot(seurat_mouse_epi, reduction = "ref.umap", group.by = "predicted.preAnnotation", label = TRUE, 
-              label.size = 3, repel = TRUE)  + ggtitle("Query transferred labels")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-p1 + p2
-
-
-p3 <- DimPlot(seurat_mouse_epi, reduction = "ref.umap", group.by = "mouse_epi_annotation", label = TRUE, 
-              label.size = 3, repel = TRUE)  + ggtitle("Mouse Annotation")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-p4 <-FeaturePlot(seurat_mouse_epi,reduction = "ref.umap",  features = "AMBN", label = F, 
-                 label.size = 3, repel = TRUE, order= T,pt.size=1)  + ggtitle("AMBN Expression")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-
-p1 + p2+ p3 + p4
-
-FeaturePlot(seurat_mouse_epi,reduction = "ref.umap",  features = "AMBN", label = TRUE, 
-            label.size = 3, repel = TRUE, order= T,pt.size=5)  + ggtitle("Query transferred labels")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-
-
 # To copy dataset data from mmonocle cds to seurat dataset
 reference.import <- reference.integrated
 
@@ -379,67 +219,8 @@ reference.import@reductions[["pca"]]@cell.embeddings <- Amelo_cds_MTi@int_colDat
 colnames(x = reference.import[["umap"]]@cell.embeddings) <- paste0("UMAP_", 1:2)
 
 
-mouse_epi.anchors <- FindTransferAnchors(reference = reference.import, query = seurat_mouse_epi, 
-                                         dims = 1:50, reference.reduction = "pca", k.anchor =50)
-seurat_mouse_epi <- MapQuery(anchorset = mouse_epi.anchors, reference = reference.import, query = seurat_mouse_epi, 
-                             refdata = list(preAnnotation = "preAnnotation"), reference.reduction = "pca", reduction.model = "umap")
-p1 <- DimPlot(reference.import, reduction = "umap", group.by = "preAnnotation", label = TRUE, label.size = 3, 
-              repel = TRUE) + NoLegend() + ggtitle("Reference annotations")#+ scale_x_reverse() +scale_y_reverse() 
-p2 <- DimPlot(seurat_mouse_epi, reduction = "ref.umap", group.by = "predicted.preAnnotation", label = TRUE, 
-              label.size = 3, repel = TRUE)  + ggtitle("Query transferred labels") #+ NoLegend()
-p3 <- DimPlot(seurat_mouse_epi, reduction = "ref.umap", group.by = "mouse_epi_annotation", label = TRUE, 
-              label.size = 3, repel = TRUE)  + ggtitle("Mouse Annotation") #+ NoLegend()
-p4 <-FeaturePlot(seurat_mouse_epi,reduction = "ref.umap",  features = "AMBN", label = F, 
-                 label.size = 3, repel = TRUE, order= T,pt.size=1)  + ggtitle("AMBN Expression") #+ NoLegend()
 
-patchwork_obj <- p1 + p2+ p3 + p4 
-
-# function to make the patchwork   object has the same scale for each plot
-p_ranges_x <- c(ggplot_build(patchwork_obj[[1]])$layout$panel_scales_x[[1]]$range$range,
-                ggplot_build(patchwork_obj[[2]])$layout$panel_scales_x[[1]]$range$range)
-
-p_ranges_y <- c(ggplot_build(patchwork_obj[[1]])$layout$panel_scales_y[[1]]$range$range,
-                ggplot_build(patchwork_obj[[2]])$layout$panel_scales_y[[1]]$range$range)
-
-
-patchwork_obj & 
-  xlim(min(p_ranges_x), max(p_ranges_x)) & 
-  ylim(min(p_ranges_y), max(p_ranges_y))
-
-
-# the reverse projecting human to mouse
-seurat_mouse_epi <- NormalizeData(seurat_mouse_epi, verbose = FALSE)
-seurat_mouse_epi <- FindVariableFeatures(seurat_mouse_epi, selection.method = "vst", nfeatures = 2000, 
-                                            verbose = FALSE)
-seurat_mouse_epi<- ScaleData(seurat_mouse_epi)
-seurat_mouse_epi <- RunPCA(seurat_mouse_epi, npcs = 30, verbose = FALSE)
-
-mouse_epi.anchors <- FindTransferAnchors(reference = seurat_mouse_epi, query = reference.integrated, 
-                                         dims = 1:30, reference.reduction = "pca")
-seurat_mouse_epi <- RunUMAP(seurat_mouse_epi, dims = 1:30, reduction = "pca", return.model = TRUE)  # already done
-reference.integrated <- MapQuery(anchorset = mouse_epi.anchors, reference = seurat_mouse_epi, query = reference.integrated, 
-                             refdata = seurat_mouse_epi$mouse_epi_annotation, reference.reduction = "pca", reduction.model = "umap")
-
-p1 <- DimPlot(seurat_mouse_epi, reduction = "umap", group.by = "mouse_epi_annotation", label = TRUE, label.size = 3, 
-              repel = TRUE) + NoLegend() + ggtitle("Reference annotations")+ scale_x_reverse() +scale_y_reverse() 
-p2 <- DimPlot(reference.integrated, reduction = "ref.umap", group.by = "predicted.mouse_epi_annotation", label = TRUE, 
-              label.size = 3, repel = TRUE)  + ggtitle("Query transferred labels")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-p1 + p2
-
-FeaturePlot(reference.integrated,reduction = "ref.umap",  features = "AMBN", label = TRUE, 
-            label.size = 3, repel = TRUE, order= T,pt.size=5)  + ggtitle("Query transferred labels")+ scale_x_reverse() +scale_y_reverse() #+ NoLegend()
-
-
-
-
-
-
-
-
-
-
-
-######################################
+####################################
 
 OE_Am.anchors <- FindTransferAnchors(reference = reference.import, query = seurat_OE_Am, 
                                      dims = 1:50, reference.reduction = "pca",scale = F)
@@ -512,9 +293,6 @@ seurat_OE_Am_sub <- readRDS("seurat_OE_Am_sub_projected_by_imported_PCA.rds")
 
 {OE_Am.anchors <- FindTransferAnchors(reference = reference.import, query = seurat_OE_Am_sub , 
                                      dims = 1:10, reference.reduction = "pca", scale = F, k.filter = NA, k.anchor = 200, n.trees = 100, nn.method = "annoy", reduction = "pcaproject" )#,l2.norm = T,project.query = T, features = c("AMBN","SP6","ENAM","SHH"))
-# predictions <- TransferData(anchorset = OE_Am.anchors, refdata = reference.integrated$preAnnotation, 
-#                             dims = 1:30)
-# seurat_OE_Am_sub  <- AddMetaData(seurat_OE_Am_sub , metadata = predictions)
 
 
 #reference.integrated <- RunUMAP(reference.integrated, dims = 1:30, reduction = "pca", return.model = TRUE)  # already done
@@ -584,8 +362,6 @@ refquery <- subset(x = refquery, subset = preAnnotation == c("diff_11", "diff_12
 seurat_OE_Am_sub <- SplitObject(refquery,split.by = "id")$`In Vitro`
 reference.import <- SplitObject(refquery,split.by = "id")$`Fetal`
 
-seurat_OE_Am_sub<- subset(x = seurat_OE_Am_sub, subset = preAnnotation == c("diff_1","diff_2","diff_3","diff_4","diff_11", "diff_12","diff_13","diff_14","diff_15"),invert = TRUE)
-seurat_OE_Am_sub<- subset(x = seurat_OE_Am_sub, subset = preAnnotation == c("diff_5","diff_6","diff_7","diff_8","diff_9", "diff_10"))
 
 
 refquery <- merge(reference.import, seurat_OE_Am_sub )
@@ -702,18 +478,6 @@ reference.import$full_annotation <- colData(Amelo_cds_MTi)$assigned_cell_type.4
 
 
 
-# IMPORTING ANNOTATION OF NEW CLUSTERING
-OE_Am_cds_d16 <- readRDS("OE_Am_cds_updated_updated_DAY_16_PESUDOtime_renamedClu.rds")
-seurat_OE_Am_sub_day_16$clustering <- c(rep(NA,ncol(Amelo_cds_MTi)), colData(OE_Am_cds_d16)$clustering)
 
-seurat_OE_Am_sub_day_16$clustering <- dplyr::recode(seurat_OE_Am_sub_day_16$clustering,
-                                                    '1'= 'D16_1',
-                                                    '2'= 'D16_2',
-                                                    '3'= 'D16_3',
-                                                    '4'= 'D16_4',
-                                                    '5'= 'D16_5',
-                                                    '6'= 'D16_6')
-
-names(seurat_OE_Am_sub_day_16$clustering) <- colnames(seurat_OE_Am_sub_day_16)
                                                     
 
