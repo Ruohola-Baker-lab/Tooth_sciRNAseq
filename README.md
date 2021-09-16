@@ -18,7 +18,7 @@ BiocManager::install(c("DEsingle","ComplexHeatmap","ViSEAGO","simplifyEnrichment
 ```
 
 ### scMLnet 
-Please follow the instructions provided by this package author to isntall the python and R components https://github.com/SunXQlab/scMLnet
+Please follow the instructions provided by this package authors to isntall the python and R components https://github.com/SunXQlab/scMLnet
 
 ### talklr
 ```r
@@ -30,3 +30,9 @@ install_github("yuliangwang/talklr")
 ```r
 install.packages('Seurat', 'treemap', 'networkD3','hrbrthemes', 'viridis', 'patchwork', 'circlize','tidyverse','tidyr','rliger','pheatmap','stringr', 'igraph','RColorBrewer','gridExtra','reshape2','ggtext')
 ```
+
+## Instructions
+The instructions to run each function are written as comments in the each R script file.
+
+### Top_pathway.R
+This file contains the main workflow to identify the top pathway activities at each step of ameloblast differnttion.
