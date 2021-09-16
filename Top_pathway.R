@@ -28,28 +28,35 @@ cds_base <- mixed_cds # replace mixed_cds with your cds name
 clustering_column <- "assigned_cell_type.simp.2"
 age_clustering_column <- "age_group"
 
+# From our data, the ameloblasts trajectory: OE -> DE-Prog -> OEE -> PA -> AM
+# can be broken down into steps that contain the progenitor/receiver that receive the signals, and the target cells of the differntaition at each steps.
+# For example:-
+#  progenitors  -> targets
+#           OE  -> DE-Prog 
+#       DE-Prog -> OEE
+#           OEE -> PA 
+#            PA -> AM
 
-#define your time point in your data
+# define the time points in your trajectory that the majority of progenitors cells of interest are present from each steps. This is obtained by analazing the timepoint density plot and age_score heatmap.
 age_list <-  c("09_11w","12_13w","14_16w","17_19w")
 
 
 # # I have separate analysis for 20_22w
 # age_list <-  c("20_22w")
 
-#this is to pull of the next age of target cell 
+# define the timepoints that differentiated cells (target cells) in specific lineage are present (e.g. POB and OB) # of timepoints matching the # of target cell populations (e.g. 3 targets, 3 timepoints). Want the earliest time point that cells are present.
 age_next_list <-  c("12_13w","14_16w","17_19w","20_22w")
 
 
-# define your receiver cell of interest at each time point
+# define your receiver cell of interest at each time point. #name the progenitor cell of interest at each time point
 receiver_cell <- list('09_11w' = "OE",
                       '12_13w' = "DE-Prog",
                       '14_16w' = "OEE",
                       '17_19w' = "PA")
 
-# # I have separate analysis for 20_22w
-# receiver_cell <- list('20_22w' = "AM-1")
 
-# define your differentiation target cell type at each time point of analysis
+
+# define your differentiation target cell type at each time point of analysis. #define your differentiated (what the receiver cell is doing to become) cell at each time point
 diff_target_cell <- list('09_11w' = "DE-Prog",
                          '12_13w' = "OEE",
                          '14_16w' = "PA",
