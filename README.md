@@ -9,7 +9,7 @@ All codes were tested on Windows 10 and Linux running R (version	3.6.3), and Pyt
 To install monocle3 Please follow the instructions provided in the Trapnell-lab website https://cole-trapnell-lab.github.io/monocle3/docs/installation/
 
 ### scMLnet 
-Please follow the instructions provided by this package authors to isntall the python and R components https://github.com/SunXQlab/scMLnet
+Please follow the instructions provided by this package authors to install the python and R components https://github.com/SunXQlab/scMLnet
 
 ### talklr
 ```r
