@@ -213,11 +213,7 @@ getLigRec <- function(LigRecTable,LigCluGene,RecCluGene)
   
   #get cluster final Lig_Rec result
   LRList <- c()
-  #LigHighGene <- intersect(LigGene,LigCluGene)
-  ###LigHighGene <- intersect(LigGene,unique(df.net$ligand))
   LigHighGene <- intersect(LigGene,unique(lr_glom_normal$Ligand.ApprovedSymbol))
-  #RecHighGene <- intersect(RecGene,RecCluGene)
-  ###RecHighGene <- intersect(RecGene,unique(unlist(strsplit(df.net$receptor, "_"))))
   RecHighGene <- intersect(RecGene,unique(lr_glom_normal$Receptor.ApprovedSymbol))
   
   
