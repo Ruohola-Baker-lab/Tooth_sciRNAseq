@@ -8,15 +8,6 @@ All codes were tested on Windows 10 and Linux running R (version	3.6.3), and Pyt
 ### Monocle3
 To install monocle3 Please follow the instructions provided in the Trapnell-lab website https://cole-trapnell-lab.github.io/monocle3/docs/installation/
 
-
-### Other Bioconductor dependencies 
-```r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-install.packages("BiocManager")
-BiocManager::install(version = "3.10")
-BiocManager::install(c("DEsingle","ComplexHeatmap","ViSEAGO","simplifyEnrichment","BiocParallel"))
-```
-
 ### scMLnet 
 Please follow the instructions provided by this package authors to isntall the python and R components https://github.com/SunXQlab/scMLnet
 
@@ -30,9 +21,19 @@ install_github("yuliangwang/talklr")
 ```r
 install.packages('Seurat', 'treemap', 'networkD3','hrbrthemes', 'viridis', 'patchwork', 'circlize','tidyverse','tidyr','rliger','pheatmap','stringr', 'igraph','RColorBrewer','gridExtra','reshape2','ggtext')
 ```
+### Other Bioconductor dependencies 
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager")
+BiocManager::install(version = "3.10")
+BiocManager::install(c("DEsingle","ComplexHeatmap","ViSEAGO","simplifyEnrichment","BiocParallel"))
+```
 
 ## Instructions
 The instructions to run each function are written as comments in the each R script file.
 
 ### Top_pathway.R
-This file contains the main workflow to identify the top pathway activities at each step of ameloblast differnttion.
+This file contains the main workflow to identify the top pathway activities at each step of ameloblast differentiation.
+
+### custom_Heatmap.R
+This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score callcuations per cluster.
