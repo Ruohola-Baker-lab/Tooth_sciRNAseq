@@ -11,13 +11,10 @@ library(monocle3)
 library(Seurat)
 
 # load the customized functions.
-source("/home/ubuntu/top_path_function.R")
-source("/home/ubuntu/Run_scMLnet.R")
-source("/home/ubuntu/Draw_MLnet.R")
-
-# the next line you have to run it once per session. It will open up a page to modify a taklr function.  
-# scroll down & before the last '}'  type the word 'net' without qoute marks, and then save
-trace("plot_lr_wiring", edit=TRUE) ### addd net before the last }
+source("top_path_function.R")
+source("Run_scMLnet.R")
+source("Draw_MLnet.R")
+source("plot_lr_wiring.R")
 
 
 #-------------------------------------------------------------------------------------------#
@@ -133,8 +130,8 @@ meta.file <- paste(out.file,"/",user.file,"/metadata", sep="")
 # no need to  modify anything below this line. Run as is.  or the heavy chunk first         #
 #___________________________________________________________________________________________#
 
-##### this part for differntail expresssion, It takes a lot of time.####
-# only run once with highest computing # Let me know when you need to run it, to switch
+##### this part for differntail expresssion, It takes a lot of time. Might take from 15-1hour####
+# only run once with highest computing # 
 pair.list <- mapply(c, receiver_cell, diff_target_cell, SIMPLIFY = FALSE)
 
 for (pair in pair.list){
@@ -202,7 +199,7 @@ for (age in age_list){
   BarCluFile <- "database/barcodetype.txt"
   BarCluTable <- read.table(BarCluFile,sep = "\t",header = TRUE,stringsAsFactors = FALSE)
   
-  RecClu <- unlist(diff_target_cell[age])
+  RecClu <- unlist(diff_target_cell[next_age])
   LigClu <- setdiff(unlist(included), RecClu) 
   RecClus <- getHighExpGene(GCMat,BarCluTable,RecClu,LigClu,pval,logfc,cores)
   saveRDS(RecClus, paste(meta.file,"/",RecClu,"_", next_age,"_enriched.rds", sep=""))
@@ -306,7 +303,7 @@ for (age in age_list){
   pair.list <- mapply(c, receiver_cell, diff_target_cell, SIMPLIFY = FALSE)
   next_age <- age_next_list[which(age_list == age)]
   enrich_1<- readRDS(paste(meta.file,"/",receiver_cell[age],"_", age,"_enriched.rds", sep=""))
-  enrich_2<- readRDS(paste(meta.file,"/",diff_target_cell[age],"_", next_age,"_enriched.rds", sep=""))
+  enrich_2<- readRDS(paste(meta.file,"/",diff_target_cell[next_age],"_", next_age,"_enriched.rds", sep=""))
   deg <- readRDS(paste(meta.file,"/","deg_0.05_",paste(unlist(pair.list[age]),collapse = '_'), ".rds",sep =''))
   filtered <- c(setdiff(c(subset(deg,deg$State%in%c("down","up"))$Gene),enrich_1),
                          intersect(intersect(enrich_1,enrich_2),subset(deg,deg$State%in%c("down","up"))$Gene))
@@ -342,7 +339,7 @@ for (age in age_list){
       receiver_cell =  receiver_cell[age],
       lr_glom_normal = lr_glom_normal,
       show.sub.pathway = F,
-      method = "NULL" , # c("KL_rec","KL_rec_lig","rescale","scale_sd","min_max","scale_no_center")
+      method = "NULL" , 
       palette = palette,
       output_dir= paste(out.file,user.file,sep= "/")
     )
