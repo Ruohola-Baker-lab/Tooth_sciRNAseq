@@ -37,18 +37,16 @@ age_clustering_column <- "age_group"
 #           OEE -> PA 
 #            PA -> AM
 
-# define the time points in your trajectory that the majority of progenitors cells of interest are present from each steps. This is obtained by analazing the timepoint density plot and age_score heatmap.
+# Each cluster can be asscoiated with a time point where the majority of the cells present. 
+# This is obtained by analazing the timepoint density plot and age_score heatmap.
+# Based on that we define two lists of age groups:-
+# A list of time points in your trajectory for the progenitors cells of interest.
 age_list <-  c("09_11w","12_13w","14_16w","17_19w")
-
-
-# # I have separate analysis for 20_22w
-# age_list <-  c("20_22w")
-
-# define the timepoints that differentiated cells (target cells) in specific lineage are present (e.g. POB and OB) # of timepoints matching the # of target cell populations (e.g. 3 targets, 3 timepoints). Want the earliest time point that cells are present.
+# A list of time points in your trajectory for the differentiated cells (target cells). Note the number of timepoints is matching the number of target cell populations (e.g. 4 targets, 4 timepoints).
 age_next_list <-  c("12_13w","14_16w","17_19w","20_22w")
 
 
-# define your receiver cell of interest at each time point. #name the progenitor cell of interest at each time point
+# name the progenitor cell of interest at each time point
 receiver_cell <- list('09_11w' = "OE",
                       '12_13w' = "DE-Prog",
                       '14_16w' = "OEE",
@@ -56,16 +54,13 @@ receiver_cell <- list('09_11w' = "OE",
 
 
 
-# define your differentiation target cell type at each time point of analysis. #define your differentiated (what the receiver cell is doing to become) cell at each time point
+# define your differentiation target cell type at each time point of analysis.
 diff_target_cell <- list('09_11w' = "DE-Prog",
                          '12_13w' = "OEE",
                          '14_16w' = "PA",
                          '17_19w' = "Am")
 
-# # I have separate analysis for 20_22w
-# diff_target_cell <- list('20_22w' = "AM-2")
-
-# Define the group of cells that are present at each time point
+# Define the group of cells that are present at each time point. These will be the sources of the ligands. These are obtained by analazing the timepoint density plot and age_score heatmap.
 in_groups <- list('09_11w' = c("OE" ,"DE-Prog",  "IK/EK", "D.mes"),
                   '12_13w' = c("DE-Prog", "IK/EK", "SR-1" , "D.mes"),
                   '14_16w' = c("IK/EK", "OEE" , "SI-1", "SI-2",  "D.mes", "Pre.O"),
@@ -73,12 +68,7 @@ in_groups <- list('09_11w' = c("OE" ,"DE-Prog",  "IK/EK", "D.mes"),
                   '20_22w' = c("Am","SI-3", "OD-2","PA"))
 
 
-# # # I have separate analysis for 20_22w
-# in_groups <- list('20_22w' = c("AM-1", "SI-3", "AM-2","OD-2","PA-2"))
-
-
-
-# define the pathways to include in the analsysis. some pathways are not major or not well known or there's no reliabe way to activate them in culture
+# define the pathways to include in the analsysis.
 path_included <- c("TGFb", "BMP", "BMP10", "GDF",   "GDNF", "NODAL", 
                    "ACTIVIN", "WNT", "ncWNT", "EGF", "NRG", "FGF", "PDGF", "VEGF", 
                    "IGF", "INSULIN",  "HH", "EDA", 
@@ -123,12 +113,12 @@ palette <-c(TGFb = "#DBC6DE", NRG = "#E2E5D5", BMP10 = "#DA3BE0", GDF = "#679C8F
 
 
 #set mode of the analysis:
-subset_by_time_point <- T  # TRUE is probably the most accurate, but sometimes you don't have ennough cells, so you skip subsetting and let it use the whole clusters
+subset_by_time_point <- T  # TRUE is probably the most accurate, but sometimes you don't have enough cells, so you skip subsetting and let it use the whole clusters
 
 
 # Create a directory to save data. 
 out.file <- "top_path_output" 
-user.file <- "Sesha"
+user.file <- "User1"
 meta.file <- paste(out.file,"/",user.file,"/metadata", sep="")
 #dir.create(meta.file, recursive = T) #already created
 
@@ -137,8 +127,8 @@ meta.file <- paste(out.file,"/",user.file,"/metadata", sep="")
 # no need to  modify anything below this line. Run as is.  or the heavy chunk first         #
 #___________________________________________________________________________________________#
 
-##### this part for differntail expresssion, It takes a lot of time. Might take from 15-1hour####
-# only run once with highest computing # 
+##### this part for differntail expresssion, It takes a lot of time. Might take from 15-60 min####
+# only run once with highest computing & RAM avilable # 
 pair.list <- mapply(c, receiver_cell, diff_target_cell, SIMPLIFY = FALSE)
 
 for (pair in pair.list){
