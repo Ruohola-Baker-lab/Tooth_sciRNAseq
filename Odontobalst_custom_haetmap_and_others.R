@@ -1,6 +1,6 @@
 
 # load the customized heatmap function.
-source("/home/ubuntu/data_sci_RNA_seq/custom_Heatmap.R")
+source("custom_Heatmap.R")
 
 # load your cds
 DEendo_122920_15dim_Euclidean_11L_0.05dist_25k <- readRDS("DEendo_122920_15dim_Euclidean_11L_0.05dist_25k.rds")
@@ -9,14 +9,14 @@ newclusters_regressed_DE_121820_30dim_Euclidean_11L_0.05dist_25k <- readRDS("new
 # custom_Heatmap: only supply your cds,  a clustering_column & age_group_column
 # you can specify the markers genes by selected_markers = c("DSPP", "AMBN")
 # or leave it to automaticly find markers by selected_markers = "auto", then set the number_of_markers
-# or do both selected_markers = c("auto", "DSPP","NES","DMP1","FGF3") to get top genes + yoursupplied genes. Note supllied geneswill be includedin goterm analysis
+# or do both selected_markers = c("auto", "DSPP","NES","DMP1","FGF3") to get top genes + yoursupplied genes. Note supllied genes will be included in goterm analysis
 # number_of_genes2goterm define the number of top genes to  use for goterm analysis. You have to find the sweet spot number. not too many and you dliute the result or too little and you miss important things
 # gene_font_size: size of the labeled genes
 # keywords_font_size: size of goterm key words
 # number_of_keywords: number of top keywords to display.
 # keywords_blacklist: this manually remove redundant, meaningless or irrleveant words from the goterm keywords
-# load_previous is to load all the saved metadata if present from previous run on same cds, so the second run on the same dataset can be faster. if you made alot of changes then select FALSE and calculate everyting again. Some variables won't do any effect if you cange them unless ou do a complete rerun
-# to be more spcific canges to number_of_genes2goterm variable will update only if yoy not load
+# load_previous is to load all the saved metadata if present from previous run on same cds, so the second run on the same dataset can be faster. if you made alot of changes then select FALSE and calculate everyting again. Some variables won't do any effect if you change them unless you do a complete rerun
+# to be more spcific changes to number_of_genes2goterm variable will update only if you not load prevous metadata
 # all results are saved in custome_Heatmap_output folder
 # it will tell you how many minutes it took to run at the end. This data take about 10min in first run
 
