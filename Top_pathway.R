@@ -31,7 +31,7 @@ age_clustering_column <- "age_group"
 # From our data, the ameloblasts trajectory: OE -> DE-Prog -> OEE -> PA -> AM
 # can be broken down into steps that contain the progenitor/receiver that receive the signals, and the target cells of the differntaition at each steps.
 # For example:-
-#  progenitors  -> targets
+# |progenitors| -> |targets|
 #           OE  -> DE-Prog 
 #       DE-Prog -> OEE
 #           OEE -> PA 
@@ -73,7 +73,7 @@ path_included <- c("TGFb", "BMP", "BMP10", "GDF",   "GDNF", "NODAL",
                    "ACTIVIN", "WNT", "ncWNT", "EGF", "NRG", "FGF", "PDGF", "VEGF", 
                    "IGF", "INSULIN",  "HH", "EDA", 
                    "NGF",    "NT", "FLT3", "HGF",  
-                   "NOTCH", "NRXN", "OCLN", 
+                   "THY1", "NRXN", "OCLN", 
                    "ROBO")
 
 # This is the full list of pathways in case you wanted to swap in something of interest. I don't recommed to include so many
@@ -108,19 +108,19 @@ palette <-c(TGFb = "#DBC6DE", NRG = "#E2E5D5", BMP10 = "#DA3BE0", GDF = "#679C8F
             ncWNT = "#64B1DF", EGF = "#66E1E1", BMP = "#E88E50", FGF = "#8580DF", 
             PDGF = "#62E4B7", VEGF = "#AAD8E1", IGF = "#D5AB90", INSULIN = "#7945DF", 
             HH = "#6EE07F", EDA = "#E2A1E0", NGF = "#8D984C", NT = "#DE8D9F", 
-            FLT3 = "#70E041", HGF = "#D9E83D", NOTCH = "#8D92BF", NRXN = "#CC4E99", 
+            FLT3 = "#70E041", HGF = "#D9E83D", THY1 = "#8D92BF", NRXN = "#CC4E99", 
             OCLN = "#E1C959", ROBO = "#B0E7BE")
 
 
 #set mode of the analysis:
-subset_by_time_point <- T  # TRUE is probably the most accurate, but sometimes you don't have enough cells, so you skip subsetting and let it use the whole clusters
+subset_by_time_point <- F  # False by default, will not subset the clusters by timepoint, insteade uses the full clusters.
 
 
 # Create a directory to save data. 
 out.file <- "top_path_output" 
 user.file <- "User1"
 meta.file <- paste(out.file,"/",user.file,"/metadata", sep="")
-#dir.create(meta.file, recursive = T) #already created
+dir.create(meta.file, recursive = T) 
 
 
 #-------------------------------------------------------------------------------------------#
@@ -135,16 +135,14 @@ for (pair in pair.list){
   temp_cds <- cds_base[,colData(cds_base)[[clustering_column]] %in% unlist(pair)]
   group = factor(colData(temp_cds)[[clustering_column]])
   results <- DEsingle(counts = counts(temp_cds), group = group, parallel = T)
-  results.classified <- DEtype(results = results, threshold = 0.1)
-  results.sig <- results.classified[results.classified$pvalue < 0.05, ]
+  results.classified <- DEtype(results = results, threshold = 0.05)
+  results.sig <- results.classified[results.classified$pvalue < 0.1, ]
   deg <- results.sig[,c(12,13,11,20,21,23,24)]
   deg$Gene <- rowData(temp_cds[rownames(deg),])$gene_short_name
   deg <- deg[,c(8,1,2,3,4,5,6,7)]
   deg$norm_total_mean_1 <- deg$norm_total_mean_1 *1000
   deg$norm_total_mean_2 <- deg$norm_total_mean_2 *1000
   colnames(deg) <- c("Gene","Cluster1_total_mean", "Cluster2_total_mean", "foldChange" , "pvalue", "pvalue.adj.FDR","Type", "State")
-  # deg[deg$foldChange > 1,]$State <- "up"
-  # deg[deg$foldChange < 1,]$State <- "down"
   saveRDS(deg,paste(meta.file,"/","deg_0.05_",paste(unlist(pair),collapse = '_'), ".rds",sep =''))
 }
 
@@ -168,7 +166,7 @@ for (age in age_list){
   BarCluTable <- read.table(BarCluFile,sep = "\t",header = TRUE,stringsAsFactors = FALSE)
   
   RecClu <- unlist(receiver_cell[age])    # the reciver
-  LigClu <- setdiff(unlist(included), RecClu)     #all clusters except the recevier
+  LigClu <- setdiff(unlist(included), c(RecClu,unlist(diff_target_cell[age])))     #all clusters except the recevier
   pval <- 0.05
   logfc <-0.15
   #get cores
@@ -196,7 +194,7 @@ for (age in age_list){
   BarCluFile <- "database/barcodetype.txt"
   BarCluTable <- read.table(BarCluFile,sep = "\t",header = TRUE,stringsAsFactors = FALSE)
   
-  RecClu <- unlist(diff_target_cell[next_age])
+  RecClu <- unlist(diff_target_cell[age])
   LigClu <- setdiff(unlist(included), RecClu) 
   RecClus <- getHighExpGene(GCMat,BarCluTable,RecClu,LigClu,pval,logfc,cores)
   saveRDS(RecClus, paste(meta.file,"/",RecClu,"_", next_age,"_enriched.rds", sep=""))
@@ -229,7 +227,7 @@ for (age in age_list){
   min_exprs <- 1.713682e-11 # for 9-11w
   thresh_exprs <- .909563e-08
   
-  CellChatDB<- readRDS("database/CellChatDB.rds")
+  CellChatDB<- readRDS("database/CellChatDB.rds")  #load database
   receptor_ligand <- receptor_ligand[receptor_ligand$Ligand.ApprovedSymbol %in% CellChatDB[ CellChatDB$pathway_name %in% path_included,]$ligand,]
   
   lr_glom_normal<-make_expressed_net(glom_normal,expressed_thresh= as.numeric(thresh_exprs),receptor_ligand,KL_method='product',pseudo_count= as.numeric(min_exprs))
@@ -241,15 +239,15 @@ for (age in age_list){
   unique(lr_glom_normal$Ligand.ApprovedSymbol)[1:100]
   unique(lr_glom_normal$Receptor.ApprovedSymbol)[1:100]
   
-  minum <- min(lr_glom_normal[,17])    #minum for12-13w 1.000009e-07
   lig_col <- 17:(17+ncol(glom_normal)-2)
   rec_col <- (17+ncol(glom_normal)-1):((17+ncol(glom_normal)-1)+ncol(glom_normal)-2)
   
+  # just a test plot
   talklr::plot_lr_wiring(as.numeric(lr_glom_normal[5,lig_col]),as.numeric(lr_glom_normal[5,rec_col]),cell_labels = colnames(glom_normal)[-1],thresh= thresh_exprs)
   
   
   
-  
+  # This part filter the incoming interactions toward the cell of interest
   lig_mat <- lr_glom_normal[,lig_col]
   colnames(lig_mat) <- colnames(glom_normal)[-1]
   recived_in_sig <- c()
@@ -281,31 +279,24 @@ for (age in age_list){
   colnames(GCMat) = as.character(colnames(temp_cds))
   rownames(GCMat) = as.character(rowData(temp_cds)$gene_short_name)
   
-  class(rownames(GCMat))=="character"
-  
-  
-  #GCMat<- as(GCMat,"dgCMatrix")
-  #GCMat<- as.matrix(GCMat)
-  
+
   # import sample annotation
   clustering <- data.frame(Barcode= colnames(temp_cds),Cluster = colData(temp_cds)[[clustering_column]])
   write.table(clustering,"database/barcodetype.txt",sep = "\t")
   BarCluFile <- "database/barcodetype.txt"
   BarCluTable <- read.table(BarCluFile,sep = "\t",header = TRUE,stringsAsFactors = FALSE)
   
-  
-  
-  types <- unique(BarCluTable$Cluster)
-  
+   
   pair.list <- mapply(c, receiver_cell, diff_target_cell, SIMPLIFY = FALSE)
   next_age <- age_next_list[which(age_list == age)]
   enrich_1<- readRDS(paste(meta.file,"/",receiver_cell[age],"_", age,"_enriched.rds", sep=""))
   enrich_2<- readRDS(paste(meta.file,"/",diff_target_cell[next_age],"_", next_age,"_enriched.rds", sep=""))
   deg <- readRDS(paste(meta.file,"/","deg_0.05_",paste(unlist(pair.list[age]),collapse = '_'), ".rds",sep =''))
-  filtered <- c(setdiff(c(subset(deg,deg$State%in%c("down","up"))$Gene),enrich_1),
-                         intersect(intersect(enrich_1,enrich_2),subset(deg,deg$State%in%c("down","up"))$Gene))
+  filtered <- c( setdiff(intersect(c(enrich_2),c(subset(deg,deg$State%in%c("down","up"))$Gene)),enrich_1),
+                 setdiff(subset(deg,deg$State%in%c("up"))$Gene,c(enrich_1,enrich_2)),
+                 intersect(intersect(enrich_1,enrich_2),subset(deg,deg$State%in%c("down","up"))$Gene)) # this line determine the group of genes considered for downstream activity
   RecClu <- unlist(receiver_cell[age])    # the reciver
-  LigClu <- setdiff(unlist(included), RecClu)     #all clusters except the recevier
+  LigClu <- setdiff(unlist(included), c(RecClu,unlist(diff_target_cell[age])))     #all clusters except the recevier
   pval <- 0.05
   logfc <-0.15
   LigRecLib <- "database/LigRec.txt"
@@ -321,7 +312,7 @@ for (age in age_list){
                       age)
   
   workdir <- paste(user.file,"metadata",age,sep="/")
-  PyHome <- "python3" # not sure if it works yet python3 /home/ubuntu/miniconda3/bin/
+  PyHome <- "python3" # or your system path to python3
   DrawMLnet(netList,LigClu,RecClu,workdir,PyHome,plotMLnet = T)
   
   saveRDS(netList, paste("top_path_output",workdir,"netList.rds",sep="/"))
