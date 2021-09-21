@@ -91,7 +91,7 @@ getHighExpGene <- function(GCMat,barCluTable,CluNum.1,CluNum.2,pval,logfc,cores)
     print(paste0("gene:",length(genes.use)))
     
     #choose Gene based on percent expressed
-    min.pct <- 0.01
+    min.pct <- 0.05
     min.diff.pct <- -Inf
     
     ##calculate pct
