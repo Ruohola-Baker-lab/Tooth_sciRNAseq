@@ -36,4 +36,4 @@ The instructions to run each function are written as comments in the each R scri
 This file contains the main workflow to identify the top pathway activities at each step of ameloblast differentiation.
 
 ### custom_Heatmap.R
-This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score callcuations per cluster.
+This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score calculations per cluster.
