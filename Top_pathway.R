@@ -18,7 +18,7 @@ source("R/plot_lr_wiring.R")
 
 
 #-------------------------------------------------------------------------------------------#
-# This part where you eneter your data specific variables                                   #
+# This part where you enter your data specific variables                                    #
 #___________________________________________________________________________________________#
 
 # load your cell dataset object (cds)
