@@ -37,3 +37,6 @@ This file contains the main workflow to identify the top pathway activities at e
 
 ### Customized_heatmap.R
 This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score calculations per cluster.
+
+### Realtime_heatmap.R
+This file contains the instructions to use the realtime heatmap function to show expression of a single gene over timepoints that can be compared across clusters.

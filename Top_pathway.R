@@ -11,21 +11,21 @@ library(monocle3)
 library(Seurat)
 
 # load the customized functions.
-source("top_path_function.R")
-source("Run_scMLnet.R")
-source("Draw_MLnet.R")
-source("plot_lr_wiring.R")
+source("R/top_path_function.R")
+source("R/Run_scMLnet.R")
+source("R/Draw_MLnet.R")
+source("R/plot_lr_wiring.R")
 
 
 #-------------------------------------------------------------------------------------------#
-# This part where you eneter your data specific variables                                   #
+# This part where you enter your data specific variables                                    #
 #___________________________________________________________________________________________#
 
-#This line is to make a copy of your cds, for simplicity
-cds_base <- mixed_cds # replace mixed_cds with your cds name 
+# load your cell dataset object (cds)
+cds_base <- readRDS("sample_datasets/all_dental_lineage_cds.rds") 
 
 # the name of your clustering column or age_group column
-clustering_column <- "assigned_cell_type.simp.2"
+clustering_column <- "assigned_cell_type"
 age_clustering_column <- "age_group"
 
 # From our data, the ameloblasts trajectory: OE -> DE-Prog -> OEE -> PA -> AM
