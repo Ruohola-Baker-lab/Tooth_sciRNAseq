@@ -4,7 +4,7 @@ source("R/custom_Heatmap.R")
 
 
 # load your cell dataset object (cds)
-amelo_odonto_cds <- readRDS("sample_datasets/dental_epithelial_lineage_cds.rds")
+dentl_epi_cds <- readRDS("sample_datasets/dental_epithelial_lineage_cds.rds")
 
 
 # custom_Heatmap: only supply your cds,  a clustering_column & age_group_column
@@ -24,7 +24,7 @@ amelo_odonto_cds <- readRDS("sample_datasets/dental_epithelial_lineage_cds.rds")
 
 ###Example
 custom_Heatmap(
-  cds = amelo_odonto_cds,
+  cds = dentl_epi_cds,
   clustering_column = "assigned_cell_type",
   age_clustering_column = "age_group",
   selected_markers = c("auto"),
