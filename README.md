@@ -35,6 +35,8 @@ The instructions to run each function are written as comments in the each R scri
 ### Top_pathway.R
 This file contains the main workflow to identify the top pathway activities at each step of ameloblast differentiation.
 
+<img src=https://github.com/Rouhola-Baker-lab/Tooth_sciRNAseq/blob/be678dcd9d7f5da0ae4d16794b86ae8b5057c710/workflow.PNG>
+
 ### Customized_heatmap.R
 This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score calculations per cluster.
 
