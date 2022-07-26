@@ -2,7 +2,7 @@
 This repository contains the R codes used for the paper (Human iPSC derived Ameloblast Differentiation guided by Single Cell Atlas of early Human Oral Development)
 
 ## System requirements:
-All codes were tested on Windows 10 and Linux running R (version	3.6.3), and Python (version 3.7).
+All codes were tested on Windows 10 (R version 4.1.1) and Linux running R (version	3.6.3), and Python (version 3.7).
 
 ## Installation:
 ### Monocle3
@@ -19,7 +19,7 @@ install_github("yuliangwang/talklr")
 
 ### other dependencies 
 ```r
-install.packages('Seurat', 'treemap', 'networkD3','hrbrthemes', 'viridis', 'patchwork', 'circlize','tidyverse','tidyr','rliger','pheatmap','stringr', 'igraph','RColorBrewer','gridExtra','reshape2','ggtext')
+install.packages(c('Seurat', 'treemap', 'networkD3','hrbrthemes', 'viridis', 'patchwork', 'circlize','tidyverse','tidyr','rliger','pheatmap','stringr', 'igraph','RColorBrewer','gridExtra','reshape2','ggtext'))
 ```
 ### Other Bioconductor dependencies 
 ```r
@@ -34,6 +34,8 @@ The instructions to run each function are written as comments in the each R scri
 
 ### Top_pathway.R
 This file contains the main workflow to identify the top pathway activities at each step of ameloblast differentiation.
+
+<img src=https://github.com/Rouhola-Baker-lab/Tooth_sciRNAseq/blob/be678dcd9d7f5da0ae4d16794b86ae8b5057c710/workflow.PNG>
 
 ### Customized_heatmap.R
 This file contains the instruction to use the customized heatmap function that utilizes the complexHeatmap package, and combines key goterms and age_score calculations per cluster.
