@@ -16,7 +16,7 @@ densities = F
 
 ### CHOOSE SAMPLE ----
 
-samplename = "80d_B2"
+samplename = "117d_K3"
 
 ## 117d_H3 
 if (samplename == "117d_H3") {
@@ -192,13 +192,13 @@ if (time == 117) {
  
 # set logic table for cell type-specific combinations of expression levels
   
-  PA = list("KRT5" = c("Low"), "IGFBP5" = c("Low"), "PCDH7" = c(0, "Low"), "FBN2" = c(0, "Low"), "VWDE" = c("High"))
-  IEE = list("KRT5" = c("Low"), "IGFBP5" = c(0), "PCDH7" = c(0, "Low"), "FBN2" = c("Low"), "VWDE" = c("Low"))
-  SII = list("KRT5" = c("High"), "IGFBP5" = c("Low"), "PCDH7" = c(0, "Low"), "FBN2" = c("High"), "VWDE" = c("High"))
+  PA = list("KRT5" = c("Low"), "IGFBP5" = c(0,"Low"), "PCDH7" = c(0, "Low"), "FBN2" = c(0, "Low"), "VWDE" = c("High"))
+  IEE = list("KRT5" = c("Low"), "IGFBP5" = c(0), "PCDH7" = c(0, "Low"), "FBN2" = c("Low", "High"), "VWDE" = c("Low"))
+  SII = list("KRT5" = c("High"), "IGFBP5" = c(0,"Low"), "PCDH7" = c(0, "Low"), "FBN2" = c("High"), "VWDE" = c("High"))
   SIO = list("KRT5" = c("High"), "IGFBP5" = c("Low","High"), "PCDH7" = c(0, "Low"), "FBN2" = c("Low", "High"), "VWDE" = c(0, "Low"))
-  OEE = list("KRT5" = c("Low","High"), "IGFBP5" = c("High"), "PCDH7" = c(0, "Low", "High"), "FBN2" = c(0, "Low"), "VWDE" = c(0))
-  CL = list("KRT5" = c("Low","High"), "IGFBP5" = c(0), "PCDH7" = c(0, "Low"), "FBN2" = c("High"), "VWDE" = c("Low"), "DSPP" = c(0), "ENAM" = c(0))
-  SRI = list("KRT5" = c("Low"), "IGFBP5" = c(0, "Low"), "PCDH7" = c(0,"Low","High"), "FBN2" = c(0), "VWDE" = c("Low"))
+  OEE = list("KRT5" = c("Low"), "IGFBP5" = c("High"), "PCDH7" = c(0, "Low", "High"), "FBN2" = c(0, "Low"), "VWDE" = c(0,"Low"))
+  CL = list("KRT5" = c("High"), "IGFBP5" = c(0), "PCDH7" = c(0, "Low"), "FBN2" = c(0,"Low", "High"), "VWDE" = c(0), "DSPP" = c(0), "ENAM" = c(0))
+  SRI = list("KRT5" = c("Low"), "IGFBP5" = c(0,"Low"), "PCDH7" = c(0,"Low","High"), "FBN2" = c(0), "VWDE" = c( "Low"))
   SRO = list("KRT5" = c("Low"), "IGFBP5" = c(0, "Low"), "PCDH7" = c(0,"Low","High"), "FBN2" = c(0), "VWDE" = c(0))
   sAM = list("KRT5" = c("Low","High"), "DSPP" = c(0, "Low"), "ENAM" = c("High"))
   eAM = list("KRT5" = c("Low","High"), "DSPP" = c("High"), "ENAM" = c(0, "Low"))
@@ -437,12 +437,12 @@ if (time == 80){
   
 # set logic table for cell type-specific combinations of expression levels  
   
-  EK = list(PCDH7 = c(0, "Low"), FBN2 = c(0,"Low", "High"), KRT5 = c("Low", "High"), VWDE = c(0, "Low"), IGFBP5 = c(0), FGF4 = c("High", "Low"))
-  IEE = list(PCDH7 = c(0, "Low"), FBN2 = c(0,"Low"), KRT5 = c("Low", "High"), VWDE = c("Low", "High"), IGFBP5 = c(0, "Low"), FGF4 = c(0, "Low"))
-  SRI = list(PCDH7 = c(0, "Low", "High"), FBN2 = c(0), KRT5 = c("Low"), VWDE = c(0,"Low"), IGFBP5 = c(0, "Low"), FGF4 = c(0, "Low"))
-  OEE = list(PCDH7 = c(0, "Low", "High"), FBN2 = c(0,"Low", "High"), KRT5 = c("Low","High"), VWDE = c(0), IGFBP5 = c("Low", "High"), FGF4 = c(0, "Low"))
-  CL = list(PCDH7 = c(0, "Low", "High"), FBN2 = c("Low","High"), KRT5 = c("Low", "High"), VWDE = c(0,"Low"), IGFBP5 = c(0, "Low"), FGF4 = c(0, "Low"))
-  SII = list(PCDH7 = c(0, "Low"), FBN2 = c("Low", "High"), KRT5 = c("Low","High"), VWDE = c("Low", "High"), IGFBP5 = c(0, "Low"), FGF4 = c(0, "Low"))
+  EK = list(PCDH7 = c(0, "Low", "High"), FBN2 = c("Low", "High"), KRT5 = c("Low", "High"), VWDE = c(0), IGFBP5 = c(0, "Low"), FGF4 = c("High"))
+  IEE = list(PCDH7 = c(0, "Low"), FBN2 = c("Low","High"), KRT5 = c("Low"), VWDE = c(0,"Low", "High"), IGFBP5 = c(0), FGF4 = c(0, "Low"))
+  SRI = list(PCDH7 = c(0, "Low", "High"), FBN2 = c(0, "Low"), KRT5 = c("Low"), VWDE = c(0,"Low"), IGFBP5 = c(0, "Low"), FGF4 = c(0, "Low"))
+  OEE = list(PCDH7 = c(0, "Low", "High"), FBN2 = c(0,"Low", "High"), KRT5 = c("Low","High"), VWDE = c(0, "Low"), IGFBP5 = c("High"), FGF4 = c(0, "Low"))
+  CL = list(PCDH7 = c(0, "Low"), FBN2 = c( "High"), KRT5 = c("Low"), VWDE = c(0, "Low"), IGFBP5 = c("Low"), FGF4 = c(0, "Low"))
+  SII = list(PCDH7 = c(0, "Low"), FBN2 = c( "High"), KRT5 = c("Low","High"), VWDE = c( "High"), IGFBP5 = c(0,"Low"), FGF4 = c(0, "Low"))
   
   
   clusterset$Cluster = 0
