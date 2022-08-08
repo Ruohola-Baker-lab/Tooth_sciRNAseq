@@ -14,7 +14,7 @@ plot_heatmap_over_realtime(
   cds= amelo_odonto_cds,
   clustering_column = "assigned_cell_type",
   age_clustering_column = "age_group",
-  selected_genes = c("SP6", "DSPP", "AMBN", "AMELX"),
+  selected_genes = c("AMELX", "AMBN","DSPP"),
   normalize = T,   # Toggle normalization
   trimm_low = T   # Trimm low cells that can be considered background and missclustered. In another words remove expression in time points that arenot likely to be real
 )
