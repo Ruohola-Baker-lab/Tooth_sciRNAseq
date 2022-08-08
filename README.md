@@ -1,5 +1,5 @@
 # Tooth_sciRNAseq
-This repository contains the R codes used for the paper (Human iPSC derived Ameloblast Differentiation guided by Single Cell Atlas of early Human Oral Development)
+This repository contains the R codes used for the paper (Human iPSC Derived Enamel Organoid Guided by Single Cell Atlas of Human Tooth Development)
 
 ## System requirements:
 All codes were tested on Windows 10 (R version 4.1.1) and Linux running R (version	3.6.3), and Python (version 3.7).
