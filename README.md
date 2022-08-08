@@ -42,3 +42,7 @@ This file contains the instruction to use the customized heatmap function that u
 
 ### Realtime_heatmap.R
 This file contains the instructions to use the realtime heatmap function to show expression of a single gene over timepoints that can be compared across clusters.
+
+### RNAScope_AM.R & RNAScope_OB.R
+These files contain the code to generate the RNAScope maps for both ameloblasts and odontoblasts.
+
